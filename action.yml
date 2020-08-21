@@ -68,7 +68,7 @@ runs:
       shell: bash
 
     - id: docker-compose-up
-      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} "cd $REPOSITORY_NAME && docker-compose -f docker-compose.yml up -d"
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} "cd $REPOSITORY_NAME && IMAGE_TAG=latest docker-compose -f docker-compose.yml up -d"
       shell: bash
 
     - id: remove-remote-folder
