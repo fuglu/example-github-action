@@ -7,8 +7,12 @@ inputs:
   docker-password:
     description: "Docker Password"
     required: true
+  docker-compose-file:
+    description: "Docker Compose File"
+    required: true
+    default: docker-compose-prod.yml
   ssh-host:
-    description: "The host you would like to deploy to"
+    description: "SSH Host"
     required: true
   ssh-user:
     description: "SSH User"
@@ -20,15 +24,21 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - id: register-repository-name
+      run: echo ::set-env name=REPOSITORY_NAME::$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//")
+      shell: bash
     - id: docker-login
       run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
       shell: bash
-    - id: echo
-      run: echo $(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//")
-      shell: bash
     - id: docker-build
-      run: docker build -t docker.pkg.github.com/${{ github.repository }}/$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//"):latest .
+      run: docker build -t docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest .
       shell: bash
     - id: docker-push
-      run: docker push docker.pkg.github.com/${{ github.repository }}/$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//"):latest
+      run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
+      shell: bash
+    - id: prepare-ssh-key
+      run: mkdir -p ~/.ssh && echo ${{ inputs.ssh-private-key }} > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+      shell: bash
+    - id: scp-docker-compose-file
+      run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME-docker-compose.yml"
       shell: bash
