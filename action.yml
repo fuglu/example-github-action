@@ -20,9 +20,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
+    - id: "Docker Login"
+      run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
       shell: bash
-    - run: docker build -t docker.pkg.github.com/${{ github.repository }}:latest .
+    - id: "Docker Build"
+      run: docker build -t docker.pkg.github.com/${{ github.repository }}/$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//"):latest .
       shell: bash
-    - run: docker push docker.pkg.github.com/${{ github.repository }}:latest
+    - id: Docker Push
+      run: docker push docker.pkg.github.com/${{ github.repository }}/$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//"):latest
       shell: bash
