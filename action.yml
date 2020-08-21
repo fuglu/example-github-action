@@ -39,6 +39,6 @@ runs:
     - id: prepare-ssh-key
       run: mkdir -p ~/.ssh && echo ${{ inputs.ssh-private-key }} > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       shell: bash
-    - id: scp-docker-compose-file
-      run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME-docker-compose.yml"
-      shell: bash
+    # - id: scp-docker-compose-file
+    #   run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME-docker-compose.yml"
+    #   shell: bash
