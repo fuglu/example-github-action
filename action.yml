@@ -53,7 +53,7 @@ runs:
       shell: bash
 
     - id: create-remote-folder
-      run: ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} mkdir -p $REPOSITORY_NAME
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} mkdir -p $REPOSITORY_NAME
       shell: bash
 
     - id: scp-docker-compose-file
