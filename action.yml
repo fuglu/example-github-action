@@ -79,5 +79,5 @@ runs:
       shell: bash
 
     - id: docker-system-prune
-      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} docker system prune
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} docker system prune -f
       shell: bash
