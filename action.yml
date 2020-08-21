@@ -62,15 +62,15 @@ runs:
 
     - id: create-docker-env-file
       run: |
-        ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} "cat <<EOF > $REPOSITORY_NAME/env.prod
+        ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} "cat <<EOF > $REPOSITORY_NAME/env.prod
         ${{ inputs.production-env-vars }}
         EOF"
       shell: bash
 
     - id: docker-compose-up
-      run: ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} "cd $REPOSITORY_NAME && docker-compose up -f docker-compose.yml"
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} "cd $REPOSITORY_NAME && docker-compose up -f docker-compose.yml"
       shell: bash
 
     - id: remove-remote-folder
-      run: ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} rm -rf $REPOSITORY_NAME
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} rm -rf $REPOSITORY_NAME
       shell: bash
