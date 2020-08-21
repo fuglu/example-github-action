@@ -20,7 +20,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login https://docker.pkg.github.com --username ${{ github.repository_owner }} --password-stdin
+    - run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ docker-user }} --password-stdin
       shell: bash
     - run: docker build -t docker.pkg.github.com/${{ github.repository }}:latest .
       shell: bash
