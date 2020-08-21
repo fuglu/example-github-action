@@ -48,6 +48,9 @@ runs:
         cat ~/.ssh/id_rsa
         echo foo
       shell: bash
+    - id: ssh-keyscan
+      run: ssh-keyscan -H ${{ inputs.ssh-host }} >> ~/.ssh/known_hosts
+      shell: bash
     - id: scp-docker-compose-file
       run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME-docker-compose.yml"
       shell: bash
