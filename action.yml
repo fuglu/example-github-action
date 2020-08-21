@@ -27,15 +27,15 @@ runs:
     - id: register-repository-name
       run: echo ::set-env name=REPOSITORY_NAME::$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//")
       shell: bash
-    - id: docker-login
-      run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
-      shell: bash
-    - id: docker-build
-      run: docker build -t docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest .
-      shell: bash
-    - id: docker-push
-      run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
-      shell: bash
+    # - id: docker-login
+    #   run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
+    #   shell: bash
+    # - id: docker-build
+    #   run: docker build -t docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest .
+    #   shell: bash
+    # - id: docker-push
+    #   run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
+    #   shell: bash
     - id: prepare-ssh-key
       run: |
         mkdir -p ~/.ssh
@@ -43,6 +43,12 @@ runs:
         ${{ inputs.ssh-private-key }}
         EOT
         chmod 600 ~/.ssh/id_rsa
+      shell: bash
+    - id: log
+      run: |
+        echo foo
+        cat ~/.ssh/id_rsa
+        echo foo
       shell: bash
     - id: scp-docker-compose-file
       run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME-docker-compose.yml"
