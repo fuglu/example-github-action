@@ -10,14 +10,15 @@ inputs:
   docker-compose-file:
     description: "Docker Compose File"
     required: true
-    default: docker-compose-prod.yml
+  docker-env-vars:
+    description: "Docker Environment Variables"
+    required: true
   ssh-host:
     description: "SSH Host"
     required: true
   ssh-user:
     description: "SSH User"
-    required: false
-    default: ci
+    required: true
   ssh-private-key:
     description: "SSH Private Key"
     required: true
@@ -36,21 +37,40 @@ runs:
     # - id: docker-push
     #   run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
     #   shell: bash
+
+    - id: create-local-ssh-folder
+      run: mkdir -p ~/.ssh
+      shell: bash
+
     - id: prepare-ssh-key
       run: |
-        mkdir -p ~/.ssh
         echo "${{ inputs.ssh-private-key }}" | sed '/^$/d' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
       shell: bash
-    - id: log
-      run: |
-        echo foo
-        cat ~/.ssh/id_rsa
-        echo foo
+
+    - id: add-known-host
+      run: ssh-keyscan -H ${{ inputs.ssh-host }} > ~/.ssh/known_hosts
       shell: bash
-    - id: ssh-keyscan
-      run: ssh-keyscan -H ${{ inputs.ssh-host }} >> ~/.ssh/known_hosts
+
+    - id: create-remote-folder
+      run: ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} mkdir -p $REPOSITORY_NAME
       shell: bash
+
     - id: scp-docker-compose-file
-      run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME-docker-compose.yml"
+      run: "scp ${{ inputs.docker-compose-file }} ${{ inputs.ssh-user }}@${{ inputs.ssh-host }}:$REPOSITORY_NAME/docker-compose.yml"
+      shell: bash
+
+    - id: create-docker-env-file
+      run: |
+        ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} "cat <<EOF > $REPOSITORY_NAME/env.prod
+        ${{ inputs.production-env-vars }}
+        EOF"
+      shell: bash
+
+    - id: docker-compose-up
+      run: ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} "cd $REPOSITORY_NAME && docker-compose up -f docker-compose.yml"
+      shell: bash
+
+    - id: remove-remote-folder
+      run: ssh ${{ inputs.ssh-user }}@{{ inputs.ssh-host }} rm -rf $REPOSITORY_NAME
       shell: bash
