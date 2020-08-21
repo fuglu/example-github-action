@@ -37,12 +37,7 @@ runs:
     #   run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
     #   shell: bash
     - id: prepare-ssh-key
-      run: |
-        mkdir -p ~/.ssh
-        cat <<EOT > ~/.ssh/id_rsa
-        ${{ inputs.ssh-private-key }}
-        EOT
-        chmod 600 ~/.ssh/id_rsa
+      run: echo "{{ inputs.ssh-private-key }}" | tr -d '\r' > ~/.ssh/id_rsa
       shell: bash
     - id: log
       run: |
