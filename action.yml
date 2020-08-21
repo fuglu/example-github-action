@@ -28,15 +28,18 @@ runs:
     - id: register-repository-name
       run: echo ::set-env name=REPOSITORY_NAME::$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//")
       shell: bash
-    # - id: docker-login
-    #   run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
-    #   shell: bash
-    # - id: docker-build
-    #   run: docker build -t docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest .
-    #   shell: bash
-    # - id: docker-push
-    #   run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
-    #   shell: bash
+
+    - id: docker-login
+      run: echo ${{ inputs.docker-password }} | docker login https://docker.pkg.github.com --username ${{ inputs.docker-user }} --password-stdin
+      shell: bash
+
+    - id: docker-build
+      run: docker build -t docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest .
+      shell: bash
+
+    - id: docker-push
+      run: docker push docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
+      shell: bash
 
     - id: create-local-ssh-folder
       run: mkdir -p ~/.ssh
@@ -73,4 +76,8 @@ runs:
 
     - id: remove-remote-folder
       run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} rm -rf $REPOSITORY_NAME
+      shell: bash
+
+    - id: docker-system-prune
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} docker system prune
       shell: bash
