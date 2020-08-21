@@ -1,10 +1,16 @@
 name: "Deploy"
 description: "Deploy using Docker and docker-compose"
 inputs:
-  host:
+  docker-user:
+    description: "Docker User"
+    required: true
+  docker-password:
+    description: "Docker Password"
+    required: true
+  ssh-host:
     description: "The host you would like to deploy to"
     required: true
-  user:
+  ssh-user:
     description: "SSH User"
     required: false
     default: ci
@@ -14,7 +20,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login --username ${{ github.repository_owner }} --password-stdin
+    - run: echo ${{ inputs.docker-password }} | docker login --username ${{ inputs.docker-user }} --password-stdin
       shell: bash
     - run: docker build -t docker.pkg.github.com/${{ github.repository }}:latest .
       shell: bash
