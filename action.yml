@@ -70,6 +70,10 @@ runs:
         EOF"
       shell: bash
 
+    - id: docker-pull-latest
+      run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} docker pull docker.pkg.github.com/${{ github.repository }}/$REPOSITORY_NAME:latest
+      shell: bash
+
     - id: docker-compose-up
       run: ssh ${{ inputs.ssh-user }}@${{ inputs.ssh-host }} "cd $REPOSITORY_NAME && IMAGE_TAG=latest docker-compose -f docker-compose.yml up -d"
       shell: bash
