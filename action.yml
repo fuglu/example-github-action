@@ -39,7 +39,7 @@ runs:
     - id: prepare-ssh-key
       run: |
         mkdir -p ~/.ssh
-        echo "{{ inputs.ssh-private-key }}" | tr -d '\r' > ~/.ssh/id_rsa
+        echo "${{ inputs.ssh-private-key }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
       shell: bash
     - id: log
